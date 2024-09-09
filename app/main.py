@@ -23,7 +23,7 @@ class User(BaseModel):
 def create_connection():
     conn = None
     try:
-        conn = sqlite3.connect('app/alunos.db', check_same_thread=False)
+        conn = sqlite3.connect('alunos.db', check_same_thread=False)
         return conn
     except Error as e:
         print(e)
