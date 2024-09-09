@@ -1,10 +1,10 @@
+from datetime import date
 import sqlite3
 from sqlite3 import Error
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
 from typing import List
-from datetime import date
 
 app = FastAPI(
     title="API de Alunos",
@@ -47,7 +47,7 @@ conn = create_connection()
 if conn is not None:
     create_table(conn)
 else:
-    print("Error! cannot create the database connection.")
+    print("Falha ao criar a conexão com o DB!")
 
 
 # Função para redirecionar para a documentação
@@ -64,7 +64,7 @@ def get_alunos():
     cur.execute("SELECT * FROM alunos")
     rows = cur.fetchall()
     if rows:
-        return [User(cpf=row[0], nome=row[1], data_nascimento=row[2]) for row in rows]
+        return [User(cpf=row[0], nome=row[1], data_nascimento=date.fromisoformat(row[2])) for row in rows]
     raise HTTPException(status_code=404, detail="Nenhum aluno encontrado")
 
 
@@ -75,7 +75,7 @@ def create_aluno(user: User):
               VALUES(?,?,?) '''
     cur = conn.cursor()
     try:
-        cur.execute(sql, (user.cpf, user.nome, user.data_nascimento))
+        cur.execute(sql, (user.cpf, user.nome, user.data_nascimento.isoformat()))  # Convertendo para string no formato ISO
         conn.commit()
     except sqlite3.IntegrityError:
         raise HTTPException(status_code=400, detail="CPF já cadastrado")
@@ -89,6 +89,5 @@ def get_aluno(cpf: int):
     cur.execute("SELECT * FROM alunos WHERE cpf=?", (cpf,))
     row = cur.fetchone()
     if row:
-        return User(cpf=row[0], nome=row[1], data_nascimento=row[2])
+        return User(cpf=row[0], nome=row[1], data_nascimento=date.fromisoformat(row[2]))  # Convertendo de string para date
     raise HTTPException(status_code=404, detail="Usuário não encontrado")
-
