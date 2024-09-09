@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
 from typing import List
+from datetime import date
 
 app = FastAPI(
     title="API de Alunos",
@@ -16,7 +17,7 @@ app = FastAPI(
 class User(BaseModel):
     cpf: int
     nome: str
-    data_nascimento: str
+    data_nascimento: date
 
 
 # Conexão e criação de tabela
